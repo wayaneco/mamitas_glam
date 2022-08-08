@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "639802461548",
+    "project_id": "mamitas-glam",
+    "storage_bucket": "mamitas-glam.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:639802461548:android:9bf94f52d2debf26d07749",
+        "android_client_info": {
+          "package_name": "com.example.shop_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "639802461548-ghe1tjur0qun39rd5rn0rom4pcjog2oj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATCWJUWYFussKLZTq-JSnVskguOYux09o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "639802461548-ghe1tjur0qun39rd5rn0rom4pcjog2oj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
