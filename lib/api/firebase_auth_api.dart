@@ -1,10 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 FirebaseAuth auth = FirebaseAuth.instance;
 FirebaseFirestore firestore = FirebaseFirestore.instance;
+final storage = FirebaseStorage.instance;
 
 const COLLECTION_USER_DATA = 'users-data';
+const COLLECTION_PROFILE = 'profile';
 
 Future signUpWithEmailAndPassword({
   required email,
@@ -81,12 +84,22 @@ Future signOut() {
   return auth.signOut().then((_) => true).catchError((_) => false);
 }
 
-// Future addCredentials({
-//   required displayName,
-//   profile,
-// }) {
+Future updateCredentials({
+  photo,
+  phoneNumber,
+  id,
+}) {
+  return storage.ref('$COLLECTION_PROFILE/$id').child('aw').putFile(photo).then(
+    (TaskSnapshot task) async {
+      final url = await task.ref.getDownloadURL();
+      await Future.wait([
+        photo != null ? auth.currentUser!.updatePhotoURL(url) : null,
+        auth.currentUser!.updatePhoneNumber(phoneNumber),
+      ]);
 
-//   return Future.wait([
-//     auth.currentUser?.updateDisplayName(displayName)m
-//   ])
-// }
+      return true;
+    },
+  ).catchError(
+    (_) => false,
+  );
+}

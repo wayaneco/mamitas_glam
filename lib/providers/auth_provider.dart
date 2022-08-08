@@ -112,6 +112,14 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  Future updateCredential({photo, phoneNumber}) async {
+    return await api.updateCredentials(
+      photo: photo,
+      phoneNumber: phoneNumber,
+      id: userCredential.uid,
+    );
+  }
+
   void clearError() {
     _error = null;
     notifyListeners();
