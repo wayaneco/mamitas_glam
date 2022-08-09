@@ -165,10 +165,10 @@ class _LoginPageScreenState extends State<LoginPageScreen> {
                               form.currentState!.save();
 
                               if (form.currentState!.validate()) {
+                                context.loaderOverlay.show();
                                 final isSuccess = await auth.login(
                                   email: fieldValue['email'],
                                   password: fieldValue['password'],
-                                  loaderOverlay: context.loaderOverlay,
                                 );
 
                                 if (isSuccess) {
@@ -182,6 +182,7 @@ class _LoginPageScreenState extends State<LoginPageScreen> {
                                   Navigator.of(context).pushReplacementNamed(
                                     ProductsOverviewScreen.routeName,
                                   );
+                                  context.loaderOverlay.hide();
                                 }
                               }
                             },

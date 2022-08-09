@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:loader_overlay/loader_overlay.dart';
+import 'package:shop_app/providers/product_provider.dart';
 
 import '../screens/single_product_screen.dart';
 
@@ -19,6 +20,7 @@ class ProductItem extends StatelessWidget {
     final ProductModel product =
         Provider.of<ProductModel>(context, listen: false);
 
+    final productProvider = Provider.of<ProductProvider>(context);
     Function addCartItem =
         Provider.of<CartProvider>(context, listen: false).addCartItem;
 
@@ -26,7 +28,13 @@ class ProductItem extends StatelessWidget {
       child: GridTile(
         footer: GridTileBar(
           leading: GestureDetector(
-            onTap: product.setFavoriteStatus,
+            onTap: () async {
+              context.loaderOverlay.show();
+              product.isFavorite
+                  ? await productProvider.removeToFavorites(product.id)
+                  : await productProvider.addToFavorites(product.id);
+              context.loaderOverlay.hide();
+            },
             child: Consumer<ProductModel>(
               builder: (ctx, _, child) => Icon(
                 product.isFavorite ? Icons.favorite : Icons.favorite_outline,

@@ -80,12 +80,8 @@ class AuthProvider with ChangeNotifier {
   Future login({
     required String email,
     required String password,
-    required loaderOverlay,
   }) async {
     try {
-      setLoading(true);
-      loaderOverlay.show();
-
       Map<String, dynamic> response = await api.signInWithEmailAndPassword(
         email: email,
         password: password,
@@ -95,18 +91,15 @@ class AuthProvider with ChangeNotifier {
         print(response['data'].user);
         userCredential = response['data'].user;
         setLoading(false);
-        loaderOverlay.hide();
         notifyListeners();
         return true;
       } else if (response['status'] == 400) {
         _error = response;
         setLoading(false);
-        loaderOverlay.hide();
         notifyListeners();
         return false;
       }
     } catch (error) {
-      loaderOverlay.hide();
       setLoading(false);
       return false;
     }
