@@ -87,19 +87,34 @@ Future signOut() {
 Future updateCredentials({
   photo,
   phoneNumber,
-  id,
-}) {
-  return storage.ref('$COLLECTION_PROFILE/$id').child('aw').putFile(photo).then(
-    (TaskSnapshot task) async {
-      final url = await task.ref.getDownloadURL();
-      await Future.wait([
-        photo != null ? auth.currentUser!.updatePhotoURL(url) : null,
-        auth.currentUser!.updatePhoneNumber(phoneNumber),
-      ]);
+  userCred,
+}) async {
+  // if (photo != null) {
+  //   return storage
+  //       .ref('$COLLECTION_PROFILE/${userCred!.uid}')
+  //       .child('aw')
+  //       .putFile(photo)
+  //       .then(
+  //     (TaskSnapshot task) async {
+  //       final url = await task.ref.getDownloadURL();
+  //       await auth.currentUser!.updatePhoneNumber(phoneNumber);
+  //       final response = await Future.wait([
+  //         auth.currentUser!.updatePhotoURL(url),
+  //       ]);
 
-      return true;
-    },
-  ).catchError(
-    (_) => false,
-  );
+  //       print(response);
+
+  //       return true;
+  //     },
+  //   ).catchError(
+  //     (_) => false,
+  //   );
+  // } else if (phoneNumber != null) {
+  return await auth.currentUser!
+      .reauthenticateWithCredential(AuthCredential(
+        providerId: userCred!.providerData[0].providerId,
+        signInMethod: EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD,
+      ))
+      .then((value) => print(value));
+  // }
 }

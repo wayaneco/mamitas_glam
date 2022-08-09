@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:provider/provider.dart';
+import 'package:shop_app/screens/products_overview_screen.dart';
 import 'package:toast/toast.dart';
 
 import '../providers/cart_item_provider.dart';
@@ -25,8 +26,28 @@ class CartItemScreen extends StatelessWidget {
       body: SafeArea(
         maintainBottomViewPadding: false,
         child: cartData.getCartItems.isEmpty
-            ? const Center(
-                child: Text('No products added'),
+            ? SizedBox(
+                width: double.infinity,
+                child: Flex(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.max,
+                  direction: Axis.vertical,
+                  children: [
+                    const Text('Ohh nooo!! Your cart is empty'),
+                    const SizedBox(
+                      height: 10.0,
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pushReplacementNamed(
+                          ProductsOverviewScreen.routeName,
+                        );
+                      },
+                      child: const Text('SHOP PRODUCTS'),
+                    )
+                  ],
+                ),
               )
             : LoaderOverlay(
                 child: Column(

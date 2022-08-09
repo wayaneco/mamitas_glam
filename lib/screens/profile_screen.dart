@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:loader_overlay/loader_overlay.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -33,8 +34,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (user != null) {
         userInfo['photoUrl'] = user!.photoURL;
         userInfo['email'] = user!.email;
-        _phoneNumberController.text =
-            user!.phoneNumber.isEmpty ? '--' : user!.phoneNumber.isEmpty;
+        _phoneNumberController.text = user!.phoneNumber ?? '--';
       }
     }
   }
@@ -42,7 +42,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthProvider>(context);
-    print(auth.user);
+    print('>>>>>>>>>>>>>>>>>>>>${auth.user.providerData[0].providerId}');
     return Scaffold(
       drawer: const AppDrawer(),
       appBar: AppBar(
@@ -74,9 +74,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     onTap: () {
                       setState(() {
                         _phoneNumberController.text =
-                            auth.user!.phoneNumber.isEmpty
-                                ? '--'
-                                : auth.user!.phoneNumber;
+                            auth.user!.phoneNumber ?? '--';
                         imageFile = null;
                         isEdit = !isEdit;
                         loading = true;
@@ -100,191 +98,208 @@ class _ProfileScreenState extends State<ProfileScreen> {
           )
         ],
       ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.all(10.0).add(
-            const EdgeInsets.only(top: 20.0),
-          ),
-          children: [
-            Align(
-              alignment: Alignment.center,
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(150),
-                  border: Border.all(
-                    width: 2,
-                    color: imageError
-                        ? Colors.red
-                        : const Color.fromARGB(255, 224, 224, 224),
-                  ),
-                ),
-                width: 150,
-                height: 150,
-                child: CircleAvatar(
-                  radius: 60,
-                  child: Stack(
-                    fit: StackFit.expand,
-                    clipBehavior: Clip.antiAlias,
-                    children: [
-                      loading
-                          ? const Center(
-                              child: CircularProgressIndicator(),
-                            )
-                          : ClipRRect(
-                              borderRadius: BorderRadius.circular(150),
-                              child: imageFile != null
-                                  ? Image.file(
-                                      File(imageFile!.path),
-                                      repeat: ImageRepeat.noRepeat,
-                                      fit: BoxFit.cover,
-                                      width: double.infinity,
-                                      isAntiAlias: true,
-                                    )
-                                  : auth.user?.photoURL != null
-                                      ? Image.network(
-                                          auth.user?.photoURL,
+      body: LoaderOverlay(
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            padding: const EdgeInsets.all(10.0).add(
+              const EdgeInsets.only(top: 20.0),
+            ),
+            children: [
+              Align(
+                alignment: Alignment.center,
+                child: AnimatedSwitcher(
+                  duration: const Duration(seconds: 5),
+                  switchInCurve: Curves.linearToEaseOut,
+                  transitionBuilder: (child, animation) {
+                    return FadeTransition(
+                      opacity: animation,
+                      child: child,
+                    );
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(150),
+                      border: Border.all(
+                        width: 2,
+                        color: imageError
+                            ? Colors.red
+                            : const Color.fromARGB(255, 224, 224, 224),
+                      ),
+                    ),
+                    width: 150,
+                    height: 150,
+                    child: CircleAvatar(
+                      radius: 60,
+                      child: Stack(
+                        fit: StackFit.expand,
+                        clipBehavior: Clip.antiAlias,
+                        children: [
+                          loading
+                              ? const Center(
+                                  child: CircularProgressIndicator(),
+                                )
+                              : ClipRRect(
+                                  borderRadius: BorderRadius.circular(150),
+                                  child: imageFile != null
+                                      ? Image.file(
+                                          File(imageFile!.path),
                                           repeat: ImageRepeat.noRepeat,
                                           fit: BoxFit.cover,
                                           width: double.infinity,
                                           isAntiAlias: true,
-                                          errorBuilder:
-                                              (context, error, stackTrace) {
-                                            return Image.asset(
+                                        )
+                                      : auth.user?.photoURL != null
+                                          ? Image.network(
+                                              auth.user?.photoURL,
+                                              repeat: ImageRepeat.noRepeat,
+                                              fit: BoxFit.cover,
+                                              width: double.infinity,
+                                              isAntiAlias: true,
+                                              errorBuilder:
+                                                  (context, error, stackTrace) {
+                                                return Image.asset(
+                                                  'assets/images/profile.png',
+                                                  repeat: ImageRepeat.noRepeat,
+                                                  fit: BoxFit.cover,
+                                                  width: double.infinity,
+                                                  isAntiAlias: true,
+                                                );
+                                              },
+                                            )
+                                          : Image.asset(
                                               'assets/images/profile.png',
                                               repeat: ImageRepeat.noRepeat,
                                               fit: BoxFit.cover,
                                               width: double.infinity,
                                               isAntiAlias: true,
-                                            );
-                                          },
-                                        )
-                                      : Image.asset(
-                                          'assets/images/profile.png',
-                                          repeat: ImageRepeat.noRepeat,
-                                          fit: BoxFit.cover,
-                                          width: double.infinity,
-                                          isAntiAlias: true,
-                                        ),
-                            ),
-                      if (isEdit)
-                        Positioned(
-                          bottom: 7,
-                          right: 7,
-                          child: GestureDetector(
-                            onTap: () async {
-                              final image = await _picker.pickImage(
-                                source: ImageSource.gallery,
-                              );
-                              setState(() {
-                                loading = true;
-                              });
-
-                              if (image != null) {
-                                setState(() {
-                                  imageError = false;
-                                  imageFile = image;
-                                });
-                                await Future.delayed(const Duration(seconds: 1),
-                                    () {
+                                            ),
+                                ),
+                          if (isEdit)
+                            Positioned(
+                              bottom: 7,
+                              right: 7,
+                              child: GestureDetector(
+                                onTap: () async {
+                                  final image = await _picker.pickImage(
+                                    source: ImageSource.gallery,
+                                  );
                                   setState(() {
-                                    loading = false;
+                                    loading = true;
                                   });
-                                });
-                              } else {
-                                setState(() {
-                                  loading = false;
-                                });
-                              }
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.all(5.0),
-                              // color: Colors.grey,
 
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.white,
-                                border: Border.all(
-                                  width: 1,
-                                  color: Colors.white,
+                                  if (image != null) {
+                                    setState(() {
+                                      imageError = false;
+                                      imageFile = image;
+                                    });
+                                    await Future.delayed(
+                                        const Duration(seconds: 1), () {
+                                      setState(() {
+                                        loading = false;
+                                      });
+                                    });
+                                  } else {
+                                    setState(() {
+                                      loading = false;
+                                    });
+                                  }
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.all(5.0),
+                                  // color: Colors.grey,
+
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.white,
+                                    border: Border.all(
+                                      width: 1,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  child: const Icon(
+                                    Icons.camera_alt,
+                                    color: Colors.grey,
+                                  ),
                                 ),
                               ),
-                              child: const Icon(
-                                Icons.camera_alt,
-                                color: Colors.grey,
-                              ),
                             ),
-                          ),
-                        ),
-                    ],
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 15.0),
-            const Align(
-              child: Text(
-                'Mark Zuckerberg',
-                style: TextStyle(
-                  fontSize: 20,
+              const SizedBox(height: 15.0),
+              const Align(
+                child: Text(
+                  'Mark Zuckerberg',
+                  style: TextStyle(
+                    fontSize: 20,
+                  ),
                 ),
               ),
-            ),
-            const Align(
-              child: Text(
-                'Hello wasd asdas',
-                style: TextStyle(
-                  fontSize: 15,
+              const Align(
+                child: Text(
+                  'Hello wasd asdas',
+                  style: TextStyle(
+                    fontSize: 15,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 15.0),
-            TextFormField(
-              enabled: isEdit,
-              initialValue: userInfo['email'],
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.email),
-                hintText: 'Email',
-                border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(horizontal: 8),
+              const SizedBox(height: 15.0),
+              TextFormField(
+                enabled: isEdit,
+                initialValue: userInfo['email'],
+                decoration: const InputDecoration(
+                  prefixIcon: Icon(Icons.email),
+                  hintText: 'Email',
+                  border: OutlineInputBorder(),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                ),
               ),
-            ),
-            const SizedBox(height: 15.0),
-            TextFormField(
-              enabled: isEdit,
-              controller: _phoneNumberController,
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.phone),
-                hintText: 'Phone Number',
-                border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(horizontal: 8),
+              const SizedBox(height: 15.0),
+              TextFormField(
+                enabled: isEdit,
+                controller: _phoneNumberController,
+                decoration: const InputDecoration(
+                  prefixIcon: Icon(Icons.phone),
+                  hintText: 'Phone Number',
+                  border: OutlineInputBorder(),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                ),
               ),
-            ),
-            const SizedBox(height: 15.0),
-            if (isEdit)
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  child: const Text('SAVE'),
-                  onPressed: () async {
-                    if (auth.user!.photoURL == null && imageFile == null) {
-                      print('WOWOWOW');
-                      setState(() {
-                        imageError = true;
-                      });
-                      return;
-                    }
+              const SizedBox(height: 15.0),
+              if (isEdit)
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    child: const Text('SAVE'),
+                    onPressed: () async {
+                      // if (auth.user!.photoURL == null && imageFile == null) {
+                      //   print('WOWOWOW');
+                      //   setState(() {
+                      //     imageError = true;
+                      //   });
+                      //   return;
+                      // }
 
-                    final image = imageFile!.path;
+                      // context.loaderOverlay.show();
+                      // final image = imageFile?.path;
 
-                    await auth.updateCredential(
-                      photo: File(image),
-                      phoneNumber: _phoneNumberController.text,
-                    );
-                  },
+                      // bool isSuccess = await auth.updateCredential(
+                      //   photo: image != null ? File(image) : null,
+                      //   phoneNumber: _phoneNumberController.text,
+                      // );
+
+                      // if (isSuccess) {
+                      //   context.loaderOverlay.hide();
+                      // }
+                    },
+                  ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -116,7 +116,7 @@ class AuthProvider with ChangeNotifier {
     return await api.updateCredentials(
       photo: photo,
       phoneNumber: phoneNumber,
-      id: userCredential.uid,
+      userCred: userCredential,
     );
   }
 
