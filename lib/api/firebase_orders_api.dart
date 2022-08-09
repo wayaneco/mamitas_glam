@@ -4,9 +4,11 @@ final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
 const COLLECTION_ORDERS = 'orders';
 
-Future<List<Map<String, dynamic>>> orders() {
+Future<List<Map<String, dynamic>>> orders(userId) {
   return firestore
       .collection(COLLECTION_ORDERS)
+      .doc(userId)
+      .collection(userId)
       .orderBy('dateOrdered', descending: true)
       .get()
       .then((QuerySnapshot snapshot) {
@@ -23,8 +25,13 @@ Future<List<Map<String, dynamic>>> orders() {
   });
 }
 
-Future<dynamic> addOrders(cartItem) async {
-  return firestore.collection(COLLECTION_ORDERS).add(cartItem).then(
+Future<dynamic> addOrders(cartItem, userId) async {
+  return firestore
+      .collection(COLLECTION_ORDERS)
+      .doc(userId)
+      .collection(userId)
+      .add(cartItem)
+      .then(
     (DocumentReference document) async {
       final data = await document.get().then((DocumentSnapshot snapshot) {
         return snapshot.data() as dynamic;

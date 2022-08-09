@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../api/firebase_cart_api.dart' as api;
@@ -5,14 +6,17 @@ import '../api/firebase_cart_api.dart' as api;
 import '../models/cart_model.dart';
 
 class CartProvider with ChangeNotifier {
+  User? user;
   final Map<String, CartModel> _cartItems = {};
+
+  CartProvider(this.user);
 
   List<CartModel> get getCartItems {
     return _cartItems.entries.map((entry) => entry.value).toList();
   }
 
   void fetchCartItems() async {
-    await api.fetchCartItems().then((cartList) {
+    await api.fetchCartItems(user!.uid).then((cartList) {
       cartList.forEach((data) {
         _cartItems.putIfAbsent(
           data['id'],
@@ -40,14 +44,17 @@ class CartProvider with ChangeNotifier {
   ) async {
     loaderOverlay.show();
 
-    await api.addCartItem({
-      'productId': productId,
-      'imageUrl': imageUrl,
-      'price': price,
-      'title': title,
-      'quantity': 1,
-      'timestamp': DateTime.now(),
-    }).then((id) {
+    await api.addCartItem(
+      {
+        'productId': productId,
+        'imageUrl': imageUrl,
+        'price': price,
+        'title': title,
+        'quantity': 1,
+        'timestamp': DateTime.now(),
+      },
+      user!.uid,
+    ).then((id) {
       _cartItems.putIfAbsent(
         id,
         () => CartModel(
@@ -71,7 +78,13 @@ class CartProvider with ChangeNotifier {
     loaderOverlay,
   ) async {
     loaderOverlay.show();
-    await api.updateQuantity(id, increment).then((data) {
+    await api
+        .updateQuantity(
+      id,
+      increment,
+      user!.uid,
+    )
+        .then((data) {
       _cartItems.update(
         id,
         (existingCartItem) => CartModel(
@@ -95,7 +108,7 @@ class CartProvider with ChangeNotifier {
     loaderOverlay,
   ) async {
     loaderOverlay.show();
-    await api.deleteCartItem(id).then((_) {
+    await api.deleteCartItem(id, user!.uid).then((_) {
       _cartItems.remove(id);
 
       loaderOverlay.hide();

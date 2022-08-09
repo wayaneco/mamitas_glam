@@ -4,9 +4,11 @@ final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
 const COLLECTION_CART = 'cart';
 
-Future fetchCartItems() {
+Future fetchCartItems(userId) {
   return firestore
       .collection(COLLECTION_CART)
+      .doc(userId)
+      .collection(userId)
       .orderBy('timestamp', descending: false)
       .get()
       .then(
@@ -29,8 +31,13 @@ Future fetchCartItems() {
       );
 }
 
-Future addCartItem(item) {
-  return firestore.collection(COLLECTION_CART).add(item).then(
+Future addCartItem(item, id) {
+  return firestore
+      .collection(COLLECTION_CART)
+      .doc(id)
+      .collection(id)
+      .add(item)
+      .then(
     (DocumentReference document) {
       return document.get().then((DocumentSnapshot snapshot) {
         final data = snapshot.data() as dynamic;
@@ -43,9 +50,11 @@ Future addCartItem(item) {
   );
 }
 
-Future updateQuantity(id, bool increment) {
+Future updateQuantity(id, bool increment, userId) {
   return firestore
       .collection(COLLECTION_CART)
+      .doc(userId)
+      .collection(userId)
       .doc(id)
       .update(
         {'quantity': FieldValue.increment(increment ? 1 : -1)},
@@ -56,13 +65,15 @@ Future updateQuantity(id, bool increment) {
       );
 }
 
-Future deleteCartItem(id) {
+Future deleteCartItem(cartId, userId) {
   return firestore
       .collection(COLLECTION_CART)
-      .doc(id)
+      .doc(userId)
+      .collection(userId)
+      .doc(cartId)
       .delete()
       .then((_) => true)
       .catchError(
-        (_) => Future.error('Error deleting $id'),
+        (_) => Future.error('Error deleting $cartId'),
       );
 }

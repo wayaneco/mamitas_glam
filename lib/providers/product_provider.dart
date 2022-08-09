@@ -5,8 +5,11 @@ import '../api/firebase._products_api.dart' as api;
 import '../models/product_model.dart';
 
 class ProductProvider with ChangeNotifier {
+  final auth;
   late List<ProductModel> _products = [];
   bool isLoading = true;
+
+  ProductProvider(this.auth);
 
   Future fetchProducts({
     bool? initFetch,
