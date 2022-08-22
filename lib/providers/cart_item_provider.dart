@@ -44,32 +44,41 @@ class CartProvider with ChangeNotifier {
   ) async {
     loaderOverlay.show();
 
-    await api.addCartItem(
-      {
-        'productId': productId,
-        'imageUrl': imageUrl,
-        'price': price,
-        'title': title,
-        'quantity': 1,
-        'timestamp': DateTime.now(),
-      },
-      user!.uid,
-    ).then((id) {
-      _cartItems.putIfAbsent(
-        id,
-        () => CartModel(
-          id: id,
-          title: title,
-          quantity: 1,
-          price: price,
-          imageUrl: imageUrl,
-          productId: productId,
-        ),
-      );
+    bool hasExisting = checkIfAlreayExistInCartItems(productId);
 
-      loaderOverlay.hide();
-      notifyListeners();
-    });
+    if (hasExisting) {
+      final matchData =
+          _cartItems.values.firstWhere((prod) => prod.productId == productId);
+
+      await updateQuantity(matchData.id, true, loaderOverlay);
+    } else {
+      await api.addCartItem(
+        {
+          'productId': productId,
+          'imageUrl': imageUrl,
+          'price': price,
+          'title': title,
+          'quantity': 1,
+          'timestamp': DateTime.now(),
+        },
+        user!.uid,
+      ).then((id) {
+        _cartItems.putIfAbsent(
+          id,
+          () => CartModel(
+            id: id,
+            title: title,
+            quantity: 1,
+            price: price,
+            imageUrl: imageUrl,
+            productId: productId,
+          ),
+        );
+
+        loaderOverlay.hide();
+        notifyListeners();
+      });
+    }
   }
 
   Future updateQuantity(
@@ -95,6 +104,7 @@ class CartProvider with ChangeNotifier {
               : existingCartItem.quantity - 1,
           price: existingCartItem.price,
           imageUrl: existingCartItem.imageUrl,
+          productId: existingCartItem.productId,
         ),
       );
 
@@ -146,5 +156,10 @@ class CartProvider with ChangeNotifier {
   void clearCart() {
     _cartItems.clear();
     notifyListeners();
+  }
+
+  bool checkIfAlreayExistInCartItems(String productId) {
+    print(_cartItems.values);
+    return _cartItems.values.map((prod) => prod.productId).contains(productId);
   }
 }

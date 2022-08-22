@@ -42,7 +42,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthProvider>(context);
-    print('>>>>>>>>>>>>>>>>>>>>${auth.user.providerData[0].providerId}');
     return Scaffold(
       drawer: const AppDrawer(),
       appBar: AppBar(
@@ -271,31 +270,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               const SizedBox(height: 15.0),
               if (isEdit)
-                SizedBox(
+                const SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    child: const Text('SAVE'),
-                    onPressed: () async {
-                      // if (auth.user!.photoURL == null && imageFile == null) {
-                      //   print('WOWOWOW');
-                      //   setState(() {
-                      //     imageError = true;
-                      //   });
-                      //   return;
-                      // }
+                    child: Text('SAVE'),
+                    onPressed: null,
+                    // onPressed: () async {
+                    //   if (auth.user!.photoURL == null && imageFile == null) {
+                    //     print('WOWOWOW');
+                    //     setState(() {
+                    //       imageError = true;
+                    //     });
+                    //     return;
+                    //   }
 
-                      // context.loaderOverlay.show();
-                      // final image = imageFile?.path;
+                    //   context.loaderOverlay.show();
+                    //   final image = imageFile?.path;
 
-                      // bool isSuccess = await auth.updateCredential(
-                      //   photo: image != null ? File(image) : null,
-                      //   phoneNumber: _phoneNumberController.text,
-                      // );
+                    //   bool isSuccess = await auth.updateCredential(
+                    //     photo: image != null ? File(image) : null,
+                    //     phoneNumber: _phoneNumberController.text,
+                    //   );
 
-                      // if (isSuccess) {
-                      //   context.loaderOverlay.hide();
-                      // }
-                    },
+                    //   if (isSuccess) {
+                    //     context.loaderOverlay.hide();
+                    //   }
+                    // },
                   ),
                 ),
             ],

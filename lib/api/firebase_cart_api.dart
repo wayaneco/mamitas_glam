@@ -22,6 +22,7 @@ Future fetchCartItems(userId) {
               'imageUrl': data['imageUrl'],
               'price': data['price'],
               'quantity': data['quantity'],
+              'productId': data['productId'],
             };
           },
         ).toList(),
