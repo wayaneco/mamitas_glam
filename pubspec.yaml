@@ -45,6 +45,7 @@ dependencies:
   localstorage: ^4.0.0+1
   firebase_storage: ^10.3.4
   http: ^0.13.5
+  flutter_native_splash: ^2.2.8
 
 dev_dependencies:
   flutter_test:
@@ -97,3 +98,6 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+flutter_native_splash:
+  image: 'assets/images/ic_launcher.png'
+  color: '#ffffff'

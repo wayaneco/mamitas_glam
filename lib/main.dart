@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 import './providers/auth_provider.dart';
 import './providers/product_provider.dart';
@@ -24,6 +25,13 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  Future.delayed(
+      const Duration(
+        seconds: 3,
+      ), () {
+    FlutterNativeSplash.remove();
+  });
 
   runApp(
     const MyApp(),
